@@ -1,0 +1,42 @@
+﻿@page "/deplacements"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using FleetSyncManager.Infrastrucure.Persistence.Entities
+@using FleetSyncManager.Infrastrucure.Persistence
+@implements IAsyncDisposable
+@inject IDbContextFactory<FleetSyncManager.Infrastrucure.Persistence.FleetSyncManagerDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="deplacements/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Deplacements">
+    <PropertyColumn Property="deplacement => deplacement.VehiculeId" />
+    <PropertyColumn Property="deplacement => deplacement.ConducteurId" />
+    <PropertyColumn Property="deplacement => deplacement.DateDepart" />
+    <PropertyColumn Property="deplacement => deplacement.DateArrivee" />
+    <PropertyColumn Property="deplacement => deplacement.LieuDepart" />
+    <PropertyColumn Property="deplacement => deplacement.LieuArrivee" />
+    <PropertyColumn Property="deplacement => deplacement.Kilometrage" />
+
+    <TemplateColumn Context="deplacement">
+        <a href="@($"deplacements/edit?deplacementid={deplacement.DeplacementId}")">Edit</a> |
+        <a href="@($"deplacements/details?deplacementid={deplacement.DeplacementId}")">Details</a> |
+        <a href="@($"deplacements/delete?deplacementid={deplacement.DeplacementId}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private FleetSyncManagerDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

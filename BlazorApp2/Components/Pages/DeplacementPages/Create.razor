@@ -1,0 +1,74 @@
+﻿@page "/deplacements/create"
+@using Microsoft.EntityFrameworkCore
+@using FleetSyncManager.Infrastrucure.Persistence.Entities
+@inject IDbContextFactory<FleetSyncManager.Infrastrucure.Persistence.FleetSyncManagerDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Deplacement</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Deplacement" OnValidSubmit="AddDeplacement" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="vehiculeid" class="form-label">VehiculeId:</label> 
+                <InputNumber id="vehiculeid" @bind-Value="Deplacement.VehiculeId" class="form-control" /> 
+                <ValidationMessage For="() => Deplacement.VehiculeId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="conducteurid" class="form-label">ConducteurId:</label> 
+                <InputNumber id="conducteurid" @bind-Value="Deplacement.ConducteurId" class="form-control" /> 
+                <ValidationMessage For="() => Deplacement.ConducteurId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="datedepart" class="form-label">DateDepart:</label> 
+                <InputDate id="datedepart" @bind-Value="Deplacement.DateDepart" class="form-control" /> 
+                <ValidationMessage For="() => Deplacement.DateDepart" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="datearrivee" class="form-label">DateArrivee:</label> 
+                <InputDate id="datearrivee" @bind-Value="Deplacement.DateArrivee" class="form-control" /> 
+                <ValidationMessage For="() => Deplacement.DateArrivee" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="lieudepart" class="form-label">LieuDepart:</label> 
+                <InputText id="lieudepart" @bind-Value="Deplacement.LieuDepart" class="form-control" /> 
+                <ValidationMessage For="() => Deplacement.LieuDepart" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="lieuarrivee" class="form-label">LieuArrivee:</label> 
+                <InputText id="lieuarrivee" @bind-Value="Deplacement.LieuArrivee" class="form-control" /> 
+                <ValidationMessage For="() => Deplacement.LieuArrivee" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="kilometrage" class="form-label">Kilometrage:</label> 
+                <InputNumber id="kilometrage" @bind-Value="Deplacement.Kilometrage" class="form-control" /> 
+                <ValidationMessage For="() => Deplacement.Kilometrage" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/deplacements">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Deplacement Deplacement { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddDeplacement()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Deplacements.Add(Deplacement);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/deplacements");
+    }
+}

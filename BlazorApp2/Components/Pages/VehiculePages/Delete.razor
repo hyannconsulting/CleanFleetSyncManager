@@ -1,0 +1,75 @@
+﻿@page "/vehicules/delete"
+@using Microsoft.EntityFrameworkCore
+@using FleetSyncManager.Infrastrucure.Persistence.Entities
+@inject IDbContextFactory<FleetSyncManager.Infrastrucure.Persistence.FleetSyncManagerDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<p>Are you sure you want to delete this?</p>
+<div>
+    <h2>Vehicule</h2>
+    <hr />
+    @if (vehicule is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Marque</dt>
+            <dd class="col-sm-10">@vehicule.Marque</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Modele</dt>
+            <dd class="col-sm-10">@vehicule.Modele</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Annee</dt>
+            <dd class="col-sm-10">@vehicule.Annee</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Immatriculation</dt>
+            <dd class="col-sm-10">@vehicule.Immatriculation</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">DateAchat</dt>
+            <dd class="col-sm-10">@vehicule.DateAchat</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Statut</dt>
+            <dd class="col-sm-10">@vehicule.Statut</dd>
+        </dl>
+        <EditForm method="post" Model="vehicule" OnValidSubmit="DeleteVehicule" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(vehicule is null)">Delete</button> |
+            <a href="/vehicules">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private Vehicule? vehicule;
+
+    [SupplyParameterFromQuery]
+    private int VehiculeId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        vehicule = await context.Vehicules.FirstOrDefaultAsync(m => m.VehiculeId == VehiculeId);
+
+        if (vehicule is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteVehicule()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Vehicules.Remove(vehicule!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/vehicules");
+    }
+}

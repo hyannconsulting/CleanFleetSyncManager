@@ -1,0 +1,58 @@
+﻿@page "/deplacements/details"
+@using Microsoft.EntityFrameworkCore
+@using FleetSyncManager.Infrastrucure.Persistence.Entities
+@inject IDbContextFactory<FleetSyncManager.Infrastrucure.Persistence.FleetSyncManagerDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Deplacement</h2>
+    <hr />
+    @if (deplacement is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">VehiculeId</dt>
+            <dd class="col-sm-10">@deplacement.VehiculeId</dd>
+            <dt class="col-sm-2">ConducteurId</dt>
+            <dd class="col-sm-10">@deplacement.ConducteurId</dd>
+            <dt class="col-sm-2">DateDepart</dt>
+            <dd class="col-sm-10">@deplacement.DateDepart</dd>
+            <dt class="col-sm-2">DateArrivee</dt>
+            <dd class="col-sm-10">@deplacement.DateArrivee</dd>
+            <dt class="col-sm-2">LieuDepart</dt>
+            <dd class="col-sm-10">@deplacement.LieuDepart</dd>
+            <dt class="col-sm-2">LieuArrivee</dt>
+            <dd class="col-sm-10">@deplacement.LieuArrivee</dd>
+            <dt class="col-sm-2">Kilometrage</dt>
+            <dd class="col-sm-10">@deplacement.Kilometrage</dd>
+        </dl>
+        <div>
+            <a href="@($"/deplacements/edit?deplacementid={deplacement.DeplacementId}")">Edit</a> |
+            <a href="@($"/deplacements")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Deplacement? deplacement;
+
+    [SupplyParameterFromQuery]
+    private int DeplacementId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        deplacement = await context.Deplacements.FirstOrDefaultAsync(m => m.DeplacementId == DeplacementId);
+
+        if (deplacement is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

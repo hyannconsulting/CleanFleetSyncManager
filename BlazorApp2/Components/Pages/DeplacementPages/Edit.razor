@@ -1,0 +1,119 @@
+﻿@page "/deplacements/edit"
+@using Microsoft.EntityFrameworkCore
+@using FleetSyncManager.Infrastrucure.Persistence.Entities
+@inject IDbContextFactory<FleetSyncManager.Infrastrucure.Persistence.FleetSyncManagerDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Deplacement</h2>
+<hr />
+@if (Deplacement is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Deplacement" OnValidSubmit="UpdateDeplacement" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Deplacement.DeplacementId" value="@Deplacement.DeplacementId" />
+                <div class="mb-3">
+                    <label for="vehiculeid" class="form-label">VehiculeId:</label>
+                    <InputNumber id="vehiculeid" @bind-Value="Deplacement.VehiculeId" class="form-control" />
+                    <ValidationMessage For="() => Deplacement.VehiculeId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="conducteurid" class="form-label">ConducteurId:</label>
+                    <InputNumber id="conducteurid" @bind-Value="Deplacement.ConducteurId" class="form-control" />
+                    <ValidationMessage For="() => Deplacement.ConducteurId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="datedepart" class="form-label">DateDepart:</label>
+                    <InputDate id="datedepart" @bind-Value="Deplacement.DateDepart" class="form-control" />
+                    <ValidationMessage For="() => Deplacement.DateDepart" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="datearrivee" class="form-label">DateArrivee:</label>
+                    <InputDate id="datearrivee" @bind-Value="Deplacement.DateArrivee" class="form-control" />
+                    <ValidationMessage For="() => Deplacement.DateArrivee" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="lieudepart" class="form-label">LieuDepart:</label>
+                    <InputText id="lieudepart" @bind-Value="Deplacement.LieuDepart" class="form-control" />
+                    <ValidationMessage For="() => Deplacement.LieuDepart" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="lieuarrivee" class="form-label">LieuArrivee:</label>
+                    <InputText id="lieuarrivee" @bind-Value="Deplacement.LieuArrivee" class="form-control" />
+                    <ValidationMessage For="() => Deplacement.LieuArrivee" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="kilometrage" class="form-label">Kilometrage:</label>
+                    <InputNumber id="kilometrage" @bind-Value="Deplacement.Kilometrage" class="form-control" />
+                    <ValidationMessage For="() => Deplacement.Kilometrage" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/deplacements">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int DeplacementId { get; set; }
+
+    [SupplyParameterFromForm]
+    private Deplacement? Deplacement { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Deplacement ??= await context.Deplacements.FirstOrDefaultAsync(m => m.DeplacementId == DeplacementId);
+
+        if (Deplacement is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateDeplacement()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Deplacement!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!DeplacementExists(Deplacement!.DeplacementId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/deplacements");
+    }
+
+    private bool DeplacementExists(int deplacementid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Deplacements.Any(e => e.DeplacementId == deplacementid);
+    }
+}

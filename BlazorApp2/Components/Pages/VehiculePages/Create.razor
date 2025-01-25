@@ -1,0 +1,69 @@
+﻿@page "/vehicules/create"
+@using Microsoft.EntityFrameworkCore
+@using FleetSyncManager.Infrastrucure.Persistence.Entities
+@inject IDbContextFactory<FleetSyncManager.Infrastrucure.Persistence.FleetSyncManagerDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Vehicule</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Vehicule" OnValidSubmit="AddVehicule" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="marque" class="form-label">Marque:</label> 
+                <InputText id="marque" @bind-Value="Vehicule.Marque" class="form-control" /> 
+                <ValidationMessage For="() => Vehicule.Marque" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="modele" class="form-label">Modele:</label> 
+                <InputText id="modele" @bind-Value="Vehicule.Modele" class="form-control" /> 
+                <ValidationMessage For="() => Vehicule.Modele" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="annee" class="form-label">Annee:</label> 
+                <InputNumber id="annee" @bind-Value="Vehicule.Annee" class="form-control" /> 
+                <ValidationMessage For="() => Vehicule.Annee" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="immatriculation" class="form-label">Immatriculation:</label> 
+                <InputText id="immatriculation" @bind-Value="Vehicule.Immatriculation" class="form-control" /> 
+                <ValidationMessage For="() => Vehicule.Immatriculation" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="dateachat" class="form-label">DateAchat:</label> 
+                <InputDate id="dateachat" @bind-Value="Vehicule.DateAchat" class="form-control" /> 
+                <ValidationMessage For="() => Vehicule.DateAchat" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="statut" class="form-label">Statut:</label> 
+                <InputText id="statut" @bind-Value="Vehicule.Statut" class="form-control" /> 
+                <ValidationMessage For="() => Vehicule.Statut" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/vehicules">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Vehicule Vehicule { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddVehicule()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Vehicules.Add(Vehicule);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/vehicules");
+    }
+}

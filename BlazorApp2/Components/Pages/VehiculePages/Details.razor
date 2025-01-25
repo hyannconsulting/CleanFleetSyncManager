@@ -1,0 +1,56 @@
+﻿@page "/vehicules/details"
+@using Microsoft.EntityFrameworkCore
+@using FleetSyncManager.Infrastrucure.Persistence.Entities
+@inject IDbContextFactory<FleetSyncManager.Infrastrucure.Persistence.FleetSyncManagerDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Vehicule</h2>
+    <hr />
+    @if (vehicule is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Marque</dt>
+            <dd class="col-sm-10">@vehicule.Marque</dd>
+            <dt class="col-sm-2">Modele</dt>
+            <dd class="col-sm-10">@vehicule.Modele</dd>
+            <dt class="col-sm-2">Annee</dt>
+            <dd class="col-sm-10">@vehicule.Annee</dd>
+            <dt class="col-sm-2">Immatriculation</dt>
+            <dd class="col-sm-10">@vehicule.Immatriculation</dd>
+            <dt class="col-sm-2">DateAchat</dt>
+            <dd class="col-sm-10">@vehicule.DateAchat</dd>
+            <dt class="col-sm-2">Statut</dt>
+            <dd class="col-sm-10">@vehicule.Statut</dd>
+        </dl>
+        <div>
+            <a href="@($"/vehicules/edit?vehiculeid={vehicule.VehiculeId}")">Edit</a> |
+            <a href="@($"/vehicules")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Vehicule? vehicule;
+
+    [SupplyParameterFromQuery]
+    private int VehiculeId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        vehicule = await context.Vehicules.FirstOrDefaultAsync(m => m.VehiculeId == VehiculeId);
+
+        if (vehicule is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}
