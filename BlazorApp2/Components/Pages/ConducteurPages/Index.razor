@@ -1,0 +1,40 @@
+﻿@page "/conducteurs"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using FleetSyncManager.Infrastrucure.Persistence.Entities
+@using FleetSyncManager.Infrastrucure.Persistence
+@implements IAsyncDisposable
+@inject IDbContextFactory<FleetSyncManager.Infrastrucure.Persistence.FleetSyncManagerDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="conducteurs/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Conducteurs">
+    <PropertyColumn Property="conducteur => conducteur.Nom" />
+    <PropertyColumn Property="conducteur => conducteur.Prenoms" />
+    <PropertyColumn Property="conducteur => conducteur.DateNaissance" />
+    <PropertyColumn Property="conducteur => conducteur.PermisConduire" />
+    <PropertyColumn Property="conducteur => conducteur.DateEmbauche" />
+
+    <TemplateColumn Context="conducteur">
+        <a href="@($"conducteurs/edit?conducteurid={conducteur.ConducteurId}")">Edit</a> |
+        <a href="@($"conducteurs/details?conducteurid={conducteur.ConducteurId}")">Details</a> |
+        <a href="@($"conducteurs/delete?conducteurid={conducteur.ConducteurId}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private FleetSyncManagerDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

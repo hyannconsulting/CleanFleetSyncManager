@@ -1,0 +1,109 @@
+﻿@page "/conducteurs/edit"
+@using Microsoft.EntityFrameworkCore
+@using FleetSyncManager.Infrastrucure.Persistence.Entities
+@inject IDbContextFactory<FleetSyncManager.Infrastrucure.Persistence.FleetSyncManagerDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Conducteur</h2>
+<hr />
+@if (Conducteur is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Conducteur" OnValidSubmit="UpdateConducteur" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Conducteur.ConducteurId" value="@Conducteur.ConducteurId" />
+                <div class="mb-3">
+                    <label for="nom" class="form-label">Nom:</label>
+                    <InputText id="nom" @bind-Value="Conducteur.Nom" class="form-control" />
+                    <ValidationMessage For="() => Conducteur.Nom" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="prenoms" class="form-label">Prenoms:</label>
+                    <InputText id="prenoms" @bind-Value="Conducteur.Prenoms" class="form-control" />
+                    <ValidationMessage For="() => Conducteur.Prenoms" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="datenaissance" class="form-label">DateNaissance:</label>
+                    <InputDate id="datenaissance" @bind-Value="Conducteur.DateNaissance" class="form-control" />
+                    <ValidationMessage For="() => Conducteur.DateNaissance" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="permisconduire" class="form-label">PermisConduire:</label>
+                    <InputText id="permisconduire" @bind-Value="Conducteur.PermisConduire" class="form-control" />
+                    <ValidationMessage For="() => Conducteur.PermisConduire" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="dateembauche" class="form-label">DateEmbauche:</label>
+                    <InputDate id="dateembauche" @bind-Value="Conducteur.DateEmbauche" class="form-control" />
+                    <ValidationMessage For="() => Conducteur.DateEmbauche" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/conducteurs">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int ConducteurId { get; set; }
+
+    [SupplyParameterFromForm]
+    private Conducteur? Conducteur { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Conducteur ??= await context.Conducteurs.FirstOrDefaultAsync(m => m.ConducteurId == ConducteurId);
+
+        if (Conducteur is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateConducteur()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Conducteur!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!ConducteurExists(Conducteur!.ConducteurId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/conducteurs");
+    }
+
+    private bool ConducteurExists(int conducteurid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Conducteurs.Any(e => e.ConducteurId == conducteurid);
+    }
+}

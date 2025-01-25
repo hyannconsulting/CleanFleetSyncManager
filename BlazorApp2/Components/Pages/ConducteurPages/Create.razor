@@ -1,0 +1,64 @@
+﻿@page "/conducteurs/create"
+@using Microsoft.EntityFrameworkCore
+@using FleetSyncManager.Infrastrucure.Persistence.Entities
+@inject IDbContextFactory<FleetSyncManager.Infrastrucure.Persistence.FleetSyncManagerDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Conducteur</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Conducteur" OnValidSubmit="AddConducteur" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="nom" class="form-label">Nom:</label> 
+                <InputText id="nom" @bind-Value="Conducteur.Nom" class="form-control" /> 
+                <ValidationMessage For="() => Conducteur.Nom" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="prenoms" class="form-label">Prenoms:</label> 
+                <InputText id="prenoms" @bind-Value="Conducteur.Prenoms" class="form-control" /> 
+                <ValidationMessage For="() => Conducteur.Prenoms" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="datenaissance" class="form-label">DateNaissance:</label> 
+                <InputDate id="datenaissance" @bind-Value="Conducteur.DateNaissance" class="form-control" /> 
+                <ValidationMessage For="() => Conducteur.DateNaissance" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="permisconduire" class="form-label">PermisConduire:</label> 
+                <InputText id="permisconduire" @bind-Value="Conducteur.PermisConduire" class="form-control" /> 
+                <ValidationMessage For="() => Conducteur.PermisConduire" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="dateembauche" class="form-label">DateEmbauche:</label> 
+                <InputDate id="dateembauche" @bind-Value="Conducteur.DateEmbauche" class="form-control" /> 
+                <ValidationMessage For="() => Conducteur.DateEmbauche" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/conducteurs">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Conducteur Conducteur { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddConducteur()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Conducteurs.Add(Conducteur);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/conducteurs");
+    }
+}

@@ -10,9 +10,9 @@ namespace FleetSyncManager.Infrastrucure.Persistence
 {
     public partial class FleetSyncManagerDbContext : DbContext
     {
-        public FleetSyncManagerDbContext()
-        {
-        }
+        //public FleetSyncManagerDbContext()
+        //{
+        //}
 
         public FleetSyncManagerDbContext(DbContextOptions<FleetSyncManagerDbContext> options)
             : base(options)
@@ -29,7 +29,7 @@ namespace FleetSyncManager.Infrastrucure.Persistence
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("Scaffolding:ConnectionString", "Data Source=(local);Initial Catalog=FleetSyncManagerDatabase;Integrated Security=true");
+            //modelBuilder.HasAnnotation("Scaffolding:ConnectionString", "Data Source=(local);Initial Catalog=FleetSyncManagerDatabase;Integrated Security=true");
 
             modelBuilder.Entity<Affectation>(entity =>
             {

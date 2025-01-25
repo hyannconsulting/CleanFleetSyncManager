@@ -1,0 +1,71 @@
+﻿@page "/conducteurs/delete"
+@using Microsoft.EntityFrameworkCore
+@using FleetSyncManager.Infrastrucure.Persistence.Entities
+@inject IDbContextFactory<FleetSyncManager.Infrastrucure.Persistence.FleetSyncManagerDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<p>Are you sure you want to delete this?</p>
+<div>
+    <h2>Conducteur</h2>
+    <hr />
+    @if (conducteur is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Nom</dt>
+            <dd class="col-sm-10">@conducteur.Nom</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Prenoms</dt>
+            <dd class="col-sm-10">@conducteur.Prenoms</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">DateNaissance</dt>
+            <dd class="col-sm-10">@conducteur.DateNaissance</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">PermisConduire</dt>
+            <dd class="col-sm-10">@conducteur.PermisConduire</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">DateEmbauche</dt>
+            <dd class="col-sm-10">@conducteur.DateEmbauche</dd>
+        </dl>
+        <EditForm method="post" Model="conducteur" OnValidSubmit="DeleteConducteur" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(conducteur is null)">Delete</button> |
+            <a href="/conducteurs">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private Conducteur? conducteur;
+
+    [SupplyParameterFromQuery]
+    private int ConducteurId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        conducteur = await context.Conducteurs.FirstOrDefaultAsync(m => m.ConducteurId == ConducteurId);
+
+        if (conducteur is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteConducteur()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Conducteurs.Remove(conducteur!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/conducteurs");
+    }
+}
